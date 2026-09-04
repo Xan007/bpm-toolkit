@@ -187,7 +187,7 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              {isEs ? 'Gestión' : 'Mgmt'}
+              {isEs ? 'Gestión' : 'Management'}
             </button>
             <button
               onClick={() => setSelectedCategory('core')}
@@ -207,7 +207,7 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              {isEs ? 'Soporte' : 'Supp'}
+              {isEs ? 'Soporte' : 'Support'}
             </button>
           </div>
         </div>
@@ -389,10 +389,10 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
 
                     <span className="text-[9px] uppercase font-bold text-slate-400 shrink-0 bg-slate-100 px-1.5 py-0.5 rounded">
                       {proc.category === 'management'
-                        ? isEs ? 'Gestión' : 'Mgmt'
+                        ? isEs ? 'Gestión' : 'Management'
                         : proc.category === 'core'
                         ? isEs ? 'Clave' : 'Core'
-                        : isEs ? 'Soporte' : 'Supp'}
+                        : isEs ? 'Soporte' : 'Support'}
                     </span>
                   </div>
 
