@@ -1,6 +1,12 @@
 # BPM Toolkit
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-bpm--toolkit.pages.dev-blue?style=for-the-badge&logo=cloudflare)](https://bpm-toolkit.pages.dev)
+[![GitHub Repository](https://img.shields.io/badge/GitHub-Xan007%2Fbpm--toolkit-black?style=for-the-badge&logo=github)](https://github.com/Xan007/bpm-toolkit)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
+
 An interactive web application designed to identify, map, prioritize, and document organizational processes. The platform implements the standard methods and formal templates defined in *Fundamentals of Business Process Management* (Marlon Dumas, Marcello La Rosa, Jan Mendling, Hajo A. Reijers).
+
+🔗 **Live Application:** [https://bpm-toolkit.pages.dev](https://bpm-toolkit.pages.dev)
 
 ---
 
@@ -10,7 +16,7 @@ An interactive web application designed to identify, map, prioritize, and docume
 Business Process Management (BPM) is a systematic discipline that combines principles, methods, and tools to identify, discover, analyze, redesign, execute, and monitor business processes. A business process is a chain of related events, activities, and decision points that involve multiple actors and resources to deliver an outcome of value to a customer.
 
 This toolkit focuses on the **Process Identification** phase of the BPM lifecycle, addressing two critical steps:
-1. **Process Architecture (Designation):** Enumerating the organization's processes, categorizing them into Management, Core, and Support, and defining their horizontal sequence and vertical hierarchy.
+1. **Process Architecture (Designation):** Enumerating the organization's processes, categorizing them into Management, Core (Value Chain), and Support, and defining their horizontal sequence and vertical hierarchy.
 2. **Process Selection (Prioritization):** Assessing processes across strategic importance, operational health, and feasibility to prioritize improvement initiatives.
 
 ---
@@ -20,7 +26,8 @@ This toolkit focuses on the **Process Identification** phase of the BPM lifecycl
 ### 1. Company & Process Inventory (`/inventory`)
 * Interactive Kanban-style board for structuring processes into Management, Core (Value Chain), and Support categories.
 * Sequential ordering and sub-group grouping for end-to-end core processes.
-* Organizational context management and pre-configured reference datasets (Higher Education, Retail & Logistics, Engineering & Consulting, Public Transport).
+* Pre-configured reference datasets (Higher Education, Retail & Logistics, Engineering & Consulting, Public Transport).
+* Built-in bilingual examples dropdown for instant dataset loading and experimentation.
 
 ### 2. Process Portfolio Matrix (`/portfolio`)
 * Interactive 2x2 matrix plotting **Health** (1-5) against **Strategic Importance** (1-5), with **Feasibility** represented as bubble gradients.
@@ -36,8 +43,8 @@ This toolkit focuses on the **Process Identification** phase of the BPM lifecycl
 ### 4. Process Profile (`/profile`)
 * Standardized process specification sheets following the formal framework from Chapter 2 (Figure 2.7 / 2.15).
 * Structured fields: Process Owner, Vision, Customer, Customer Expectation, Outcome, Trigger, First/Last Activity, Inbound/Outbound Interfaces, Required Resources (Human, Information, Work Environment), and Key Performance Measures.
-* Built-in interactive guidance with theoretical foundations, identification criteria, and reference examples.
-* One-click 10pt clean table clipboard copy (for Word/Docs) and PDF export.
+* Seamless bilingual support (Spanish & English) with non-destructive language state fallbacks.
+* Multi-export dropdowns: Copy current or all completed process tables for Word/Docs, and export single or multi-page consolidated PDFs (1 page per process).
 
 ---
 
