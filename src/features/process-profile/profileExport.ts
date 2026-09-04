@@ -1,6 +1,7 @@
-﻿import { BPMProcess, AppConfig } from '../../types';
+import { BPMProcess, AppConfig } from '../../types';
 import { escapeXml } from '../../drawio';
 import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas';
 
 export const buildProfileHtmlTable = (
   proc: BPMProcess,
@@ -8,7 +9,9 @@ export const buildProfileHtmlTable = (
   fontSizePt: number = 10
 ): string => {
   const isEs = config.language === 'es';
-  const prof = proc.profile || {};
+  const prof = (!isEs && proc.profileEn)
+    ? { ...(proc.profile || {}), ...proc.profileEn }
+    : (proc.profile || proc.profileEn || {});
   const font = config.fontFamily || 'Arial, sans-serif';
 
   const lblName = isEs ? 'Nombre del Proceso' : 'Process Name';
@@ -118,7 +121,9 @@ export const buildProfileHtmlTable = (
 };
 
 export const buildProfilePlainText = (proc: BPMProcess, isEs: boolean): string => {
-  const prof = proc.profile || {};
+  const prof = (!isEs && proc.profileEn)
+    ? { ...(proc.profile || {}), ...proc.profileEn }
+    : (proc.profile || proc.profileEn || {});
   const lblName = isEs ? 'Nombre del Proceso' : 'Process Name';
   const lblVision = isEs ? 'Visión' : 'Vision';
   const lblOwner = isEs ? 'Responsable del Proceso' : 'Process Owner';
@@ -147,24 +152,109 @@ export const buildProfilePlainText = (proc: BPMProcess, isEs: boolean): string =
   ].join('\n');
 };
 
-export const exportProfileToPdf = (proc: BPMProcess, language: string) => {
+export const exportProfileToPdf = async (proc: BPMProcess, config: AppConfig) => {
+  const isEs = config.language === 'es';
+  const language = config.language;
+
+  // Create temporary container element to render table in DOM for html2canvas / jsPDF
+  const tempDiv = document.createElement('div');
+  tempDiv.style.position = 'fixed';
+  tempDiv.style.left = '0';
+  tempDiv.style.top = '0';
+  tempDiv.style.width = '700px';
+  tempDiv.style.zIndex = '-9999';
+  tempDiv.style.backgroundColor = '#ffffff';
+  tempDiv.style.padding = '20px';
+  tempDiv.innerHTML = buildProfileHtmlTable(proc, config, 10);
+  document.body.appendChild(tempDiv);
+
+  try {
+    const canvas = await html2canvas(tempDiv, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#ffffff',
+    });
+
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF({
+      orientation: 'portrait',
+      unit: 'pt',
+      format: 'letter',
+    });
+
+    const pdfWidth = pdf.internal.pageSize.getWidth() - 72; // 36pt margins
+    const imgWidth = canvas.width;
+    const imgHeight = canvas.height;
+    const pdfHeight = (imgHeight * pdfWidth) / imgWidth;
+
+    pdf.addImage(imgData, 'PNG', 36, 36, pdfWidth, pdfHeight);
+
+    const safeName = proc.name.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
+    pdf.save(`perfil_proceso_${safeName}_${language}.pdf`);
+  } catch (err) {
+    console.error('Error generating PDF:', err);
+  } finally {
+    if (document.body.contains(tempDiv)) {
+      document.body.removeChild(tempDiv);
+    }
+  }
+};
+
+export const exportMultipleProfilesToPdf = async (
+  processes: BPMProcess[],
+  config: AppConfig
+) => {
+  if (processes.length === 0) return;
+  const isEs = config.language === 'es';
+
+  const tempDiv = document.createElement('div');
+  tempDiv.style.position = 'fixed';
+  tempDiv.style.left = '0';
+  tempDiv.style.top = '0';
+  tempDiv.style.width = '700px';
+  tempDiv.style.zIndex = '-9999';
+  tempDiv.style.backgroundColor = '#ffffff';
+  tempDiv.style.padding = '20px';
+  document.body.appendChild(tempDiv);
+
   const pdf = new jsPDF({
     orientation: 'portrait',
     unit: 'pt',
     format: 'letter',
   });
 
-  const container = document.getElementById('process-profile-table-container');
-  if (!container) return;
+  try {
+    for (let i = 0; i < processes.length; i++) {
+      const proc = processes[i];
+      tempDiv.innerHTML = buildProfileHtmlTable(proc, config, 10);
 
-  pdf.html(container, {
-    callback: function (doc) {
-      const safeName = proc.name.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
-      doc.save(`perfil_proceso_${safeName}_${language}.pdf`);
-    },
-    x: 36,
-    y: 36,
-    width: 540,
-    windowWidth: 720,
-  });
+      const canvas = await html2canvas(tempDiv, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#ffffff',
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdfWidth = pdf.internal.pageSize.getWidth() - 72; // 36pt margins
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const pdfHeight = (imgHeight * pdfWidth) / imgWidth;
+
+      if (i > 0) {
+        pdf.addPage();
+      }
+
+      pdf.addImage(imgData, 'PNG', 36, 36, pdfWidth, pdfHeight);
+    }
+
+    const fileName = isEs ? `perfiles_de_proceso_completos_${config.language}.pdf` : `all_process_profiles_${config.language}.pdf`;
+    pdf.save(fileName);
+  } catch (err) {
+    console.error('Error generating multi-profile PDF:', err);
+  } finally {
+    if (document.body.contains(tempDiv)) {
+      document.body.removeChild(tempDiv);
+    }
+  }
 };
+

@@ -75,6 +75,7 @@ export const App: React.FC = () => {
               onSaveInlineEdit={bpm.saveInlineEdit}
               onCancelInlineEdit={bpm.cancelInlineEdit}
               onDragEnd={bpm.onDragEnd}
+              onLoadExample={bpm.loadExample}
             />
           </div>
         )}

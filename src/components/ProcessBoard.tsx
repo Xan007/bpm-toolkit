@@ -1,6 +1,7 @@
-﻿import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { BPMProcess, ProcessCategory } from '../types';
-import { Plus } from 'lucide-react';
+import { Plus, Sparkles, ChevronDown, Check } from 'lucide-react';
+import { EXAMPLES } from '../examples';
 import { DragDropContext, DropResult } from '@hello-pangea/dnd';
 import { SimpleCategoryColumn } from './board/SimpleCategoryColumn';
 import { CoreCategoryColumn } from './board/CoreCategoryColumn';
@@ -29,6 +30,7 @@ interface ProcessBoardProps {
   onCancelInlineEdit: () => void;
 
   onDragEnd: (result: DropResult) => void;
+  onLoadExample?: (exampleId: string) => void;
 }
 
 export const ProcessBoard: React.FC<ProcessBoardProps> = ({
@@ -55,7 +57,21 @@ export const ProcessBoard: React.FC<ProcessBoardProps> = ({
   onCancelInlineEdit,
 
   onDragEnd,
+  onLoadExample,
 }) => {
+  const [isExamplesOpen, setIsExamplesOpen] = useState(false);
+  const examplesMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (examplesMenuRef.current && !examplesMenuRef.current.contains(e.target as Node)) {
+        setIsExamplesOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const mgmtProcesses = processes
     .filter((p) => p.category === 'management')
     .sort((a, b) => (a.sequenceOrder || 0) - (b.sequenceOrder || 0));
@@ -85,13 +101,50 @@ export const ProcessBoard: React.FC<ProcessBoardProps> = ({
             </p>
           </div>
 
-          <button
-            onClick={() => onOpenCreateModal()}
-            className="bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium px-3.5 py-1.5 rounded transition-colors cursor-pointer flex items-center gap-1.5"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            {isEs ? 'Nuevo Proceso' : 'New Process'}
-          </button>
+          <div className="flex items-center gap-2">
+            {/* Dropdown de Ejemplos Simplificado */}
+            {onLoadExample && (
+              <div className="relative" ref={examplesMenuRef}>
+                <button
+                  type="button"
+                  onClick={() => setIsExamplesOpen(!isExamplesOpen)}
+                  className="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-medium px-3 py-1.5 rounded-md transition-colors cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                >
+                  <span>{isEs ? 'Ejemplos' : 'Examples'}</span>
+                  <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                </button>
+
+                {isExamplesOpen && (
+                  <div className="absolute right-0 top-full mt-1 z-50 w-56 bg-white border border-slate-200 rounded-lg shadow-lg py-1 text-xs text-slate-700 animate-in fade-in zoom-in-95 duration-100">
+                    {EXAMPLES.map((ex) => (
+                      <button
+                        key={ex.id}
+                        type="button"
+                        onClick={() => {
+                          onLoadExample(ex.id);
+                          setIsExamplesOpen(false);
+                        }}
+                        className="w-full px-3 py-2 text-left hover:bg-slate-50 flex items-center justify-between transition-colors cursor-pointer"
+                      >
+                        <span className="font-medium text-slate-800">{ex.name}</span>
+                        <span className="text-[10px] text-slate-400 font-mono">
+                          {ex.processes.length} {isEs ? 'proc.' : 'procs.'}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            <button
+              onClick={() => onOpenCreateModal()}
+              className="bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium px-3.5 py-1.5 rounded-md transition-colors cursor-pointer flex items-center gap-1.5 shadow-2xs"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              {isEs ? 'Nuevo Proceso' : 'New Process'}
+            </button>
+          </div>
         </div>
 
         {/* 3 Columnas Kanban */}

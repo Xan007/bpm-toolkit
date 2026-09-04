@@ -32,6 +32,7 @@ export interface BPMProcess {
   labelPosition: LabelPosition;
   visible?: boolean;      // Visibilidad en el Portafolio (por defecto true)
   profile?: ProcessProfileData;
+  profileEn?: ProcessProfileData; // Perfil en inglés para soporte bilingüe
 }
 
 export interface CompanyProfile {
