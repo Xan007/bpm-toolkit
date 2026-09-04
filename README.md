@@ -93,22 +93,47 @@ npm run build
 
 ```
 src/
-├── components/            # UI components and modals
-│   ├── modals/            # Process creation, deletion, assignment modals
+├── components/                    # Shared UI components
+│   ├── board/                     # Kanban-style process board columns
+│   │   ├── CoreCategoryColumn.tsx
+│   │   └── SimpleCategoryColumn.tsx
+│   ├── modals/                    # Process creation, deletion, assignment modals
+│   │   ├── AssignProcessModal.tsx
+│   │   ├── CreateProcessModal.tsx
+│   │   ├── DeleteGroupModal.tsx
+│   │   ├── DeleteProcessModal.tsx
+│   │   └── SettingsModal.tsx
 │   ├── CompanyProfileSection.tsx
 │   ├── Header.tsx
 │   ├── LoadExampleSection.tsx
 │   ├── ProcessBoard.tsx
 │   └── ProcessCard.tsx
-├── hooks/                 # Custom React hooks (useBPMState)
-├── apqc.ts                # APQC PCF taxonomy definitions
-├── ArchitectureView.tsx   # Process Architecture map and Draw.io integration
-├── PortfolioView.tsx      # 2x2 Process Portfolio Matrix
-├── ProcessProfileView.tsx # Standardized Process Profile sheet
-├── drawio.ts              # Draw.io XML generators and parsers
-├── examples.ts            # Pre-configured industry datasets
-├── portfolioLayout.ts     # Label layout and cluster collision resolution
-└── types.ts               # Core TypeScript definitions
+├── features/
+│   ├── portfolio/                 # Process Portfolio Matrix feature
+│   │   ├── components/
+│   │   │   ├── PortfolioSvgMatrix.tsx  # SVG 2×2 matrix with label placement
+│   │   │   └── RatingPills.tsx         # Strategic value / performance rating UI
+│   │   └── portfolioExport.ts          # CSV / clipboard export for portfolio
+│   └── process-profile/           # Process Profile sheet feature
+│       ├── components/
+│       │   ├── HelpTooltipButton.tsx
+│       │   ├── ProcessProfileForm.tsx
+│       │   ├── ProcessSelectorDropdown.tsx
+│       │   └── ProfileHelpModal.tsx
+│       ├── helpDictionary.ts           # Field help texts (ES / EN)
+│       └── profileExport.ts            # Copy-table & PDF export logic
+├── hooks/
+│   └── useBPMState.ts             # Central state management hook
+├── apqc.ts                        # APQC PCF taxonomy definitions
+├── App.tsx                        # Root component and tab routing
+├── ArchitectureView.tsx           # Process Architecture map + Draw.io integration
+├── drawio.ts                      # Draw.io XML generators and parsers
+├── DrawioEmbed.tsx                # Embedded Draw.io iframe component
+├── examples.ts                    # Pre-configured industry datasets (bilingual)
+├── portfolioLayout.ts             # Label layout and collision resolution
+├── PortfolioView.tsx              # Portfolio Matrix tab
+├── ProcessProfileView.tsx         # Process Profile tab
+└── types.ts                       # Core TypeScript type definitions
 ```
 
 ---
