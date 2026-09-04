@@ -1,7 +1,6 @@
 # BPM Toolkit
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-bpm--toolkit.pages.dev-blue?style=for-the-badge&logo=cloudflare)](https://bpm-toolkit.pages.dev)
-[![GitHub Repository](https://img.shields.io/badge/GitHub-Xan007%2Fbpm--toolkit-black?style=for-the-badge&logo=github)](https://github.com/Xan007/bpm-toolkit)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
 
 An interactive web application designed to identify, map, prioritize, and document organizational processes. The platform implements the standard methods and formal templates defined in *Fundamentals of Business Process Management* (Marlon Dumas, Marcello La Rosa, Jan Mendling, Hajo A. Reijers).
