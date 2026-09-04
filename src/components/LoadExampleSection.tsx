@@ -11,32 +11,26 @@ export const LoadExampleSection: React.FC<LoadExampleSectionProps> = ({
   isEs,
 }) => {
   return (
-    <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs flex flex-col justify-between">
-      <div>
-        <div className="pb-2.5 mb-3 border-b border-slate-100">
-          <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
-            {isEs ? 'Cargar Plantilla' : 'Load Template'}
-          </h3>
-        </div>
+    <div className="bg-white border border-slate-200 rounded-lg p-3 shadow-2xs flex flex-col justify-center">
+      <div className="flex items-center justify-between pb-1.5 mb-2 border-b border-slate-100">
+        <h3 className="text-[11px] font-bold text-slate-900 uppercase tracking-wider">
+          {isEs ? 'Plantillas Rápidas' : 'Quick Templates'}
+        </h3>
+      </div>
 
-        <div className="grid grid-cols-1 gap-1.5">
-          {EXAMPLES.map((ex) => (
-            <button
-              key={ex.id}
-              onClick={() => onLoadExample(ex.id)}
-              className="group flex items-center justify-between px-3 py-2 bg-slate-50/70 hover:bg-slate-900 hover:text-white border border-slate-200/80 hover:border-slate-900 rounded-lg transition-all duration-150 cursor-pointer text-left"
-            >
-              <div className="flex flex-col">
-                <span className="text-xs font-semibold text-slate-800 group-hover:text-white transition-colors">
-                  {ex.name}
-                </span>
-                <span className="text-[10.5px] text-slate-400 group-hover:text-slate-300 line-clamp-1 transition-colors">
-                  {ex.company.industry}
-                </span>
-              </div>
-            </button>
-          ))}
-        </div>
+      <div className="grid grid-cols-2 sm:grid-cols-2 gap-1.5">
+        {EXAMPLES.map((ex) => (
+          <button
+            key={ex.id}
+            onClick={() => onLoadExample(ex.id)}
+            className="flex items-center justify-between px-2.5 py-1.5 bg-slate-50/70 hover:bg-slate-900 hover:text-white border border-slate-200/80 hover:border-slate-900 rounded transition-all duration-150 cursor-pointer text-left group"
+            title={`${ex.name} - ${ex.company.industry}`}
+          >
+            <span className="text-[11.5px] font-medium text-slate-800 group-hover:text-white truncate">
+              {ex.name}
+            </span>
+          </button>
+        ))}
       </div>
     </div>
   );

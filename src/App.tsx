@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { useBPMState } from './hooks/useBPMState';
 import { Header } from './components/Header';
-import { CompanyProfileSection } from './components/CompanyProfileSection';
-import { LoadExampleSection } from './components/LoadExampleSection';
 import { ProcessBoard } from './components/ProcessBoard';
 import { PortfolioView } from './PortfolioView';
 import { ArchitectureView } from './ArchitectureView';
@@ -55,20 +53,7 @@ export const App: React.FC = () => {
       {/* Main Content */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-6">
         {bpm.activeTab === 'inventory' && (
-          <div className="flex flex-col gap-6">
-            {/* Top Section: Organization Profile & Load Examples */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              <CompanyProfileSection
-                company={bpm.company}
-                onUpdateCompany={bpm.setCompany}
-                isEs={isEs}
-              />
-              <LoadExampleSection
-                onLoadExample={bpm.loadExample}
-                isEs={isEs}
-              />
-            </div>
-
+          <div className="flex flex-col gap-4">
             {/* Kanban Process Board */}
             <ProcessBoard
               processes={bpm.processes}

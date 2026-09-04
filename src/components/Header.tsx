@@ -41,7 +41,7 @@ export const Header: React.FC<HeaderProps> = ({
           }`}
         >
           <Building2 className="w-3.5 h-3.5" />
-          {isEs ? 'Empresa y Procesos' : 'Company & Processes'}
+          {isEs ? 'Procesos' : 'Processes'}
         </button>
         <button
           onClick={() => onSetActiveTab('portfolio')}
