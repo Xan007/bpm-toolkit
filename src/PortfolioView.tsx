@@ -1,4 +1,4 @@
-﻿import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { BPMProcess, AppConfig, ProcessCategory } from './types';
 import {
   computeDispersedClusters,
@@ -285,7 +285,7 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
         {/* COLUMNA IZQUIERDA: MEDIDAS DE DESEMPEÑO Y LISTA */}
-        <div className="lg:col-span-5 flex flex-col gap-3 bg-white border border-slate-200 rounded-lg p-4 shadow-2xs">
+        <div className="lg:col-span-4 xl:col-span-4 flex flex-col gap-3 bg-white border border-slate-200 rounded-lg p-3.5 shadow-2xs">
           <div className="flex items-center justify-between pb-2 border-b border-slate-100">
             <div className="flex items-center gap-1.5">
               <h3 className="text-xs font-semibold text-slate-900">
@@ -431,7 +431,7 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
         </div>
 
         {/* COLUMNA DERECHA: VISUALIZACIÓN MATRIZ 2x2 */}
-        <div className="lg:col-span-7 flex flex-col gap-3">
+        <div className="lg:col-span-8 xl:col-span-8 flex flex-col gap-3">
           <div className="bg-white border border-slate-200 rounded-lg p-4 shadow-2xs">
             <div className="flex items-center justify-between pb-2 mb-3 border-b border-slate-100">
               <span className="text-xs font-semibold text-slate-900">

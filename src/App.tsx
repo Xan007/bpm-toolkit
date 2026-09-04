@@ -51,7 +51,7 @@ export const App: React.FC = () => {
       />
 
       {/* Main Content */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-6">
+      <main className="flex-1 max-w-[1550px] w-full mx-auto px-4 sm:px-6 py-5">
         {bpm.activeTab === 'inventory' && (
           <div className="flex flex-col gap-4">
             {/* Kanban Process Board */}

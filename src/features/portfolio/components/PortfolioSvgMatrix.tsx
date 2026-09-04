@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { BPMProcess, AppConfig } from '../../../types';
 import { getFeasibilityColor, escapeXml } from '../../../drawio';
 import {
@@ -186,13 +186,13 @@ export const PortfolioSvgMatrix: React.FC<PortfolioSvgMatrixProps> = ({
                 x={label.tx.toFixed(1)}
                 y={label.ty.toFixed(1)}
                 textAnchor={label.anchor}
-                fontSize={config.fontSize - 1.5}
-                fill={isSelected ? '#000000' : '#1a1a1a'}
+                fontSize={Math.max(12, config.fontSize)}
+                fill={isSelected ? '#000000' : '#1e293b'}
                 fontWeight={isSelected ? '700' : 'normal'}
-                style={{ lineHeight: 1.15 }}
+                style={{ lineHeight: 1.2 }}
               >
                 {label.lines.map((ln: string, lIdx: number) => (
-                  <tspan key={lIdx} x={label.tx.toFixed(1)} dy={lIdx === 0 ? 0 : lineH}>
+                  <tspan key={lIdx} x={label.tx.toFixed(1)} dy={lIdx === 0 ? 0 : 15.5}>
                     {escapeXml(ln)}
                   </tspan>
                 ))}
