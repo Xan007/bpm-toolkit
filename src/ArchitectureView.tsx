@@ -229,9 +229,12 @@ export const ArchitectureView: React.FC<ArchitectureViewProps> = ({
     if (activeSvg) {
       const container = document.getElementById('architecture-svg-preview-container');
       const svgElem = container?.querySelector('svg');
+
       let targetW = W;
       let targetH = svgH;
+
       if (svgElem) {
+        // Parsear dimensiones reales del viewBox o del BoundingBox renderizado
         const viewBox = svgElem.getAttribute('viewBox');
         if (viewBox) {
           const parts = viewBox.trim().split(/[\s,]+/).map(Number);
@@ -240,20 +243,46 @@ export const ArchitectureView: React.FC<ArchitectureViewProps> = ({
             targetH = parts[3];
           }
         } else {
-          const wAttr = parseFloat(svgElem.getAttribute('width') || '');
-          const hAttr = parseFloat(svgElem.getAttribute('height') || '');
-          if (!isNaN(wAttr) && wAttr > 0) targetW = wAttr;
-          if (!isNaN(hAttr) && hAttr > 0) targetH = hAttr;
+          const bbox = svgElem.getBBox ? svgElem.getBBox() : null;
+          if (bbox && bbox.width > 0 && bbox.height > 0) {
+            targetW = Math.ceil(bbox.x + bbox.width + 20);
+            targetH = Math.ceil(bbox.y + bbox.height + 20);
+          } else {
+            const wAttr = parseFloat(svgElem.getAttribute('width') || '');
+            const hAttr = parseFloat(svgElem.getAttribute('height') || '');
+            if (!isNaN(wAttr) && wAttr > 0) targetW = wAttr;
+            if (!isNaN(hAttr) && hAttr > 0) targetH = hAttr;
+          }
         }
       }
 
-      // Asegurar que el SVG contenga xmlns y atributos explícitos width/height para el parser de Image() del navegador
       let cleanSource = activeSvg.trim();
+
+      // Asegurar namespace XML obligatorio
       if (!cleanSource.includes('xmlns="http://www.w3.org/2000/svg"')) {
         cleanSource = cleanSource.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
       }
-      if (!cleanSource.includes('width=')) {
-        cleanSource = cleanSource.replace('<svg', `<svg width="${targetW}" height="${targetH}"`);
+
+      // Reemplazar o asegurar atributos explícitos de width, height y viewBox
+      const hasViewBox = cleanSource.includes('viewBox=');
+      if (!hasViewBox) {
+        cleanSource = cleanSource.replace('<svg', `<svg viewBox="0 0 ${targetW} ${targetH}"`);
+      }
+
+      cleanSource = cleanSource.replace(/width="[^"]*"/, `width="${targetW}"`);
+      cleanSource = cleanSource.replace(/height="[^"]*"/, `height="${targetH}"`);
+
+      // Inyectar o actualizar el bloque <style> dentro del SVG para forzar que los div de foreignObject y textos mantengan el tamaño exacto de 11px y la tipografía
+      const embeddedStyles = `<style>
+        svg { font-family: ${config.fontFamily || 'Arial, sans-serif'}; }
+        div, span, p, text { font-family: ${config.fontFamily || 'Arial, sans-serif'} !important; }
+        foreignObject div { font-size: 11px !important; line-height: 1.2 !important; }
+      </style>`;
+
+      if (cleanSource.includes('<style')) {
+        cleanSource = cleanSource.replace(/<style[^>]*>[\s\S]*?<\/style>/i, embeddedStyles);
+      } else {
+        cleanSource = cleanSource.replace(/(<svg[^>]*>)/i, `$1${embeddedStyles}`);
       }
 
       return { source: cleanSource, width: targetW, height: targetH };
@@ -262,8 +291,21 @@ export const ArchitectureView: React.FC<ArchitectureViewProps> = ({
     const svgElem = document.getElementById('architecture-svg-preview');
     if (!svgElem) return null;
     const serializer = new XMLSerializer();
+    let src = serializer.serializeToString(svgElem);
+
+    const embeddedStyles = `<style>
+      svg { font-family: ${config.fontFamily || 'Arial, sans-serif'}; }
+      div, span, text { font-family: ${config.fontFamily || 'Arial, sans-serif'} !important; }
+    </style>`;
+
+    if (src.includes('<style')) {
+      src = src.replace(/<style[^>]*>[\s\S]*?<\/style>/i, embeddedStyles);
+    } else {
+      src = src.replace(/(<svg[^>]*>)/i, `$1${embeddedStyles}`);
+    }
+
     return {
-      source: serializer.serializeToString(svgElem),
+      source: src,
       width: W,
       height: svgH,
     };
@@ -275,14 +317,15 @@ export const ArchitectureView: React.FC<ArchitectureViewProps> = ({
   ): Promise<string> => {
     return new Promise((resolve, reject) => {
       const img = new Image();
-      // Usar data URI base64 para máxima compatibilidad con el motor de render de SVG en canvas
       const encodedSvg = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(data.source);
 
       img.onload = () => {
         try {
           const canvas = document.createElement('canvas');
-          canvas.width = data.width * 2;
-          canvas.height = data.height * 2;
+          // Escala 2x para resolución HD sin alterar la proporción original
+          const scale = 2;
+          canvas.width = data.width * scale;
+          canvas.height = data.height * scale;
           const ctx = canvas.getContext('2d');
           if (!ctx) {
             reject(new Error('Canvas context not available'));
@@ -292,7 +335,7 @@ export const ArchitectureView: React.FC<ArchitectureViewProps> = ({
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
           }
-          ctx.scale(2, 2);
+          ctx.scale(scale, scale);
           ctx.drawImage(img, 0, 0, data.width, data.height);
           resolve(canvas.toDataURL(format, format === 'image/jpeg' ? 0.95 : undefined));
         } catch (err) {
