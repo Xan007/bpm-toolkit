@@ -13,8 +13,8 @@ export const CompanyProfileSection: React.FC<CompanyProfileSectionProps> = ({
   isEs,
 }) => {
   return (
-    <div className="md:col-span-2 bg-white border border-slate-200 rounded-xl p-5 shadow-2xs flex flex-col justify-between">
-      <div className="pb-2.5 mb-3.5 border-b border-slate-100">
+    <div className="md:col-span-2 bg-white border border-slate-200 rounded-xl p-5 shadow-2xs flex flex-col">
+      <div className="pb-2.5 mb-3 border-b border-slate-100">
         <h2 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
           {isEs ? 'Perfil de la Organización' : 'Organization Profile'}
         </h2>
