@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react';
+﻿import React, { useMemo, useState, useEffect } from 'react';
 import { BPMProcess, AppConfig, ProcessCategory } from './types';
 import {
   computeDispersedClusters,
@@ -13,7 +13,7 @@ import {
   padX,
   padY
 } from './portfolioLayout';
-import { Download, Eye, EyeOff, HelpCircle, ChevronDown, Table, Check } from 'lucide-react';
+import { Download, Eye, EyeOff, HelpCircle, ChevronDown, Check, Copy } from 'lucide-react';
 import { RatingPills } from './features/portfolio/components/RatingPills';
 import { PortfolioSvgMatrix } from './features/portfolio/components/PortfolioSvgMatrix';
 import {
@@ -203,24 +203,9 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={copyTableToClipboard}
-                className={`flex items-center gap-1.5 px-2 py-1 rounded text-[11px] font-medium transition-all cursor-pointer border ${
-                  copiedTable
-                    ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
-                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:text-slate-900 shadow-2xs'
-                }`}
-                title={isEs ? 'Copiar tabla formateada para Word, Google Docs o Excel' : 'Copy formatted table for Word, Google Docs or Excel'}
-              >
-                {copiedTable ? <Check className="w-3 h-3 text-emerald-600" /> : <Table className="w-3 h-3 text-slate-500" />}
-                <span>{copiedTable ? (isEs ? '¡Copiado!' : 'Copied!') : (isEs ? 'Copiar tabla' : 'Copy table')}</span>
-              </button>
-              <span className="text-[11px] font-medium text-slate-500">
-                {visibleProcesses.length} {isEs ? 'visibles' : 'visible'}
-              </span>
-            </div>
+            <span className="text-xs font-medium text-slate-500">
+              {visibleProcesses.length} {isEs ? 'visibles' : 'visible'}
+            </span>
           </div>
 
           {/* Filtros por Categoría */}
@@ -375,70 +360,74 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
             {isEs ? 'Matriz 2x2 de Portafolio' : '2x2 Portfolio Matrix'}
           </span>
 
-          <div className="relative">
+          <div className="flex items-center gap-2">
             <button
-              onClick={() => setIsDownloadOpen(!isDownloadOpen)}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-slate-900 hover:bg-slate-800 rounded-md transition-colors cursor-pointer shadow-2xs"
+              type="button"
+              onClick={copyTableToClipboard}
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors cursor-pointer border ${
+                copiedTable
+                  ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                  : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:text-slate-900 shadow-2xs'
+              }`}
             >
-              <Download className="w-3.5 h-3.5" />
-              <span>{isEs ? 'Descargar' : 'Download'}</span>
-              <ChevronDown className="w-3.5 h-3.5 opacity-70" />
+              {copiedTable ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-slate-500" />}
+              <span>{copiedTable ? (isEs ? '¡Copiado!' : 'Copied!') : (isEs ? 'Copiar Tabla' : 'Copy Table')}</span>
             </button>
 
-            {isDownloadOpen && (
-              <div
-                className="absolute right-0 top-full mt-1 z-50 w-44 bg-white border border-slate-200 rounded-lg shadow-lg py-1 text-xs text-slate-700 animate-in fade-in zoom-in-95 duration-100"
-                onClick={() => setIsDownloadOpen(false)}
+            <div className="relative">
+              <button
+                onClick={() => setIsDownloadOpen(!isDownloadOpen)}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-slate-900 hover:bg-slate-800 rounded-md transition-colors cursor-pointer shadow-2xs"
               >
-                <button
-                  onClick={() => exportPortfolioDrawio(visibleProcesses, config)}
-                  className="w-full px-3 py-2 text-left hover:bg-slate-50 flex items-center justify-between transition-colors cursor-pointer"
+                <Download className="w-3.5 h-3.5" />
+                <span>{isEs ? 'Descargar' : 'Download'}</span>
+                <ChevronDown className="w-3.5 h-3.5 opacity-70" />
+              </button>
+
+              {isDownloadOpen && (
+                <div
+                  className="absolute right-0 top-full mt-1 z-50 w-44 bg-white border border-slate-200 rounded-lg shadow-lg py-1 text-xs text-slate-700 animate-in fade-in zoom-in-95 duration-100"
+                  onClick={() => setIsDownloadOpen(false)}
                 >
-                  <span className="font-medium text-slate-800">Draw.io</span>
-                  <span className="text-[10px] text-slate-400 font-mono">.drawio</span>
-                </button>
-                <button
-                  onClick={() => exportPortfolioPNG(config.language)}
-                  className="w-full px-3 py-2 text-left hover:bg-slate-50 flex items-center justify-between transition-colors cursor-pointer"
-                >
-                  <span className="font-medium text-slate-800">PNG</span>
-                  <span className="text-[10px] text-slate-400 font-mono">.png</span>
-                </button>
-                <button
-                  onClick={() => exportPortfolioSVG(config.language)}
-                  className="w-full px-3 py-2 text-left hover:bg-slate-50 flex items-center justify-between transition-colors cursor-pointer"
-                >
-                  <span className="font-medium text-slate-800">SVG</span>
-                  <span className="text-[10px] text-slate-400 font-mono">.svg</span>
-                </button>
-                <button
-                  onClick={() => exportPortfolioJPEG(config.language)}
-                  className="w-full px-3 py-2 text-left hover:bg-slate-50 flex items-center justify-between transition-colors cursor-pointer"
-                >
-                  <span className="font-medium text-slate-800">JPEG</span>
-                  <span className="text-[10px] text-slate-400 font-mono">.jpg</span>
-                </button>
-                <div className="my-1 border-t border-slate-100" />
-                <button
-                  onClick={() => exportPortfolioPDF(config.language)}
-                  className="w-full px-3 py-2 text-left hover:bg-slate-50 flex items-center justify-between transition-colors cursor-pointer text-slate-800 font-medium"
-                >
-                  <span>PDF</span>
-                  <span className="text-[10px] text-slate-400 font-mono">.pdf</span>
-                </button>
-                <div className="my-1 border-t border-slate-100" />
-                <button
-                  onClick={copyTableToClipboard}
-                  className="w-full px-3 py-2 text-left hover:bg-slate-50 flex items-center justify-between transition-colors cursor-pointer"
-                >
-                  <span className="font-medium text-slate-800 flex items-center gap-1.5">
-                    {copiedTable ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Table className="w-3.5 h-3.5 text-slate-500" />}
-                    <span>{isEs ? 'Copiar Tabla (Word/Docs)' : 'Copy Table (Word/Docs)'}</span>
-                  </span>
-                  <span className="text-[10px] text-slate-400 font-mono">{copiedTable ? (isEs ? '¡Listo!' : 'Done!') : '.table'}</span>
-                </button>
-              </div>
-            )}
+                  <button
+                    onClick={() => exportPortfolioDrawio(visibleProcesses, config)}
+                    className="w-full px-3 py-2 text-left hover:bg-slate-50 flex items-center justify-between transition-colors cursor-pointer"
+                  >
+                    <span className="font-medium text-slate-800">Draw.io</span>
+                    <span className="text-[10px] text-slate-400 font-mono">.drawio</span>
+                  </button>
+                  <button
+                    onClick={() => exportPortfolioPNG(config.language)}
+                    className="w-full px-3 py-2 text-left hover:bg-slate-50 flex items-center justify-between transition-colors cursor-pointer"
+                  >
+                    <span className="font-medium text-slate-800">PNG</span>
+                    <span className="text-[10px] text-slate-400 font-mono">.png</span>
+                  </button>
+                  <button
+                    onClick={() => exportPortfolioSVG(config.language)}
+                    className="w-full px-3 py-2 text-left hover:bg-slate-50 flex items-center justify-between transition-colors cursor-pointer"
+                  >
+                    <span className="font-medium text-slate-800">SVG</span>
+                    <span className="text-[10px] text-slate-400 font-mono">.svg</span>
+                  </button>
+                  <button
+                    onClick={() => exportPortfolioJPEG(config.language)}
+                    className="w-full px-3 py-2 text-left hover:bg-slate-50 flex items-center justify-between transition-colors cursor-pointer"
+                  >
+                    <span className="font-medium text-slate-800">JPEG</span>
+                    <span className="text-[10px] text-slate-400 font-mono">.jpg</span>
+                  </button>
+                  <div className="my-1 border-t border-slate-100" />
+                  <button
+                    onClick={() => exportPortfolioPDF(config.language)}
+                    className="w-full px-3 py-2 text-left hover:bg-slate-50 flex items-center justify-between transition-colors cursor-pointer text-slate-800 font-medium"
+                  >
+                    <span>PDF</span>
+                    <span className="text-[10px] text-slate-400 font-mono">.pdf</span>
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
