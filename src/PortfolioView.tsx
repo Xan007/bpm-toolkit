@@ -159,14 +159,137 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-      {/* COLUMNA IZQUIERDA: MEDIDAS DE DESEMPEÑO Y CONTROLES */}
-      <div className="lg:col-span-4 flex flex-col gap-3 bg-white border border-slate-200 rounded-lg p-4 shadow-2xs">
-        <div className="flex flex-col gap-2.5 pb-3 border-b border-slate-100">
-          <div className="flex items-center justify-between">
+    <div className="flex flex-col gap-4">
+      {/* Barra Superior Unificada: Filtros/Título a la izquierda y acciones globales a la derecha */}
+      <div className="flex flex-wrap items-center justify-between bg-white border border-slate-200 rounded-lg px-3.5 py-2 shadow-2xs gap-3">
+        <div className="flex items-center gap-3">
+          <span className="text-xs font-semibold text-slate-900">
+            {isEs ? 'Portafolio de Procesos' : 'Process Portfolio'}
+          </span>
+          
+          {/* Filtros por Categoría compactos en barra superior */}
+          <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-md text-xs font-medium border border-slate-200/70">
+            <button
+              onClick={() => setSelectedCategory('all')}
+              className={`px-2.5 py-1 text-center rounded transition-colors cursor-pointer text-xs ${
+                selectedCategory === 'all'
+                  ? 'bg-white text-slate-900 font-semibold shadow-2xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              {isEs ? 'Todos' : 'All'} ({processes.filter((p) => p.visible !== false).length})
+            </button>
+            <button
+              onClick={() => setSelectedCategory('management')}
+              className={`px-2.5 py-1 text-center rounded transition-colors cursor-pointer text-xs ${
+                selectedCategory === 'management'
+                  ? 'bg-white text-slate-900 font-semibold shadow-2xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              {isEs ? 'Gestión' : 'Mgmt'}
+            </button>
+            <button
+              onClick={() => setSelectedCategory('core')}
+              className={`px-2.5 py-1 text-center rounded transition-colors cursor-pointer text-xs ${
+                selectedCategory === 'core'
+                  ? 'bg-white text-slate-900 font-semibold shadow-2xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              {isEs ? 'Clave' : 'Core'}
+            </button>
+            <button
+              onClick={() => setSelectedCategory('support')}
+              className={`px-2.5 py-1 text-center rounded transition-colors cursor-pointer text-xs ${
+                selectedCategory === 'support'
+                  ? 'bg-white text-slate-900 font-semibold shadow-2xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              {isEs ? 'Soporte' : 'Supp'}
+            </button>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={copyTableToClipboard}
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors cursor-pointer border ${
+              copiedTable
+                ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:text-slate-900 shadow-2xs'
+            }`}
+          >
+            {copiedTable ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-slate-500" />}
+            <span>{copiedTable ? (isEs ? '¡Copiado!' : 'Copied!') : (isEs ? 'Copiar Tabla' : 'Copy Table')}</span>
+          </button>
+
+          <div className="relative">
+            <button
+              onClick={() => setIsDownloadOpen(!isDownloadOpen)}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-slate-900 hover:bg-slate-800 rounded-md transition-colors cursor-pointer shadow-2xs"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>{isEs ? 'Descargar' : 'Download'}</span>
+              <ChevronDown className="w-3.5 h-3.5 opacity-70" />
+            </button>
+
+            {isDownloadOpen && (
+              <div
+                className="absolute right-0 top-full mt-1 z-50 w-44 bg-white border border-slate-200 rounded-lg shadow-lg py-1 text-xs text-slate-700 animate-in fade-in zoom-in-95 duration-100"
+                onClick={() => setIsDownloadOpen(false)}
+              >
+                <button
+                  onClick={() => exportPortfolioDrawio(visibleProcesses, config)}
+                  className="w-full px-3 py-2 text-left hover:bg-slate-50 flex items-center justify-between transition-colors cursor-pointer"
+                >
+                  <span className="font-medium text-slate-800">Draw.io</span>
+                  <span className="text-[10px] text-slate-400 font-mono">.drawio</span>
+                </button>
+                <button
+                  onClick={() => exportPortfolioPNG(config.language)}
+                  className="w-full px-3 py-2 text-left hover:bg-slate-50 flex items-center justify-between transition-colors cursor-pointer"
+                >
+                  <span className="font-medium text-slate-800">PNG</span>
+                  <span className="text-[10px] text-slate-400 font-mono">.png</span>
+                </button>
+                <button
+                  onClick={() => exportPortfolioSVG(config.language)}
+                  className="w-full px-3 py-2 text-left hover:bg-slate-50 flex items-center justify-between transition-colors cursor-pointer"
+                >
+                  <span className="font-medium text-slate-800">SVG</span>
+                  <span className="text-[10px] text-slate-400 font-mono">.svg</span>
+                </button>
+                <button
+                  onClick={() => exportPortfolioJPEG(config.language)}
+                  className="w-full px-3 py-2 text-left hover:bg-slate-50 flex items-center justify-between transition-colors cursor-pointer"
+                >
+                  <span className="font-medium text-slate-800">JPEG</span>
+                  <span className="text-[10px] text-slate-400 font-mono">.jpg</span>
+                </button>
+                <div className="my-1 border-t border-slate-100" />
+                <button
+                  onClick={() => exportPortfolioPDF(config.language)}
+                  className="w-full px-3 py-2 text-left hover:bg-slate-50 flex items-center justify-between transition-colors cursor-pointer text-slate-800 font-medium"
+                >
+                  <span>PDF</span>
+                  <span className="text-[10px] text-slate-400 font-mono">.pdf</span>
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+        {/* COLUMNA IZQUIERDA: MEDIDAS DE DESEMPEÑO Y LISTA */}
+        <div className="lg:col-span-5 flex flex-col gap-3 bg-white border border-slate-200 rounded-lg p-4 shadow-2xs">
+          <div className="flex items-center justify-between pb-2 border-b border-slate-100">
             <div className="flex items-center gap-1.5">
-              <h3 className="text-sm font-semibold text-slate-900">
-                {isEs ? 'Medidas de desempeño' : 'Performance Metrics'}
+              <h3 className="text-xs font-semibold text-slate-900">
+                {isEs ? 'Medidas de Desempeño' : 'Performance Metrics'}
               </h3>
               <div className="relative">
                 <button
@@ -203,249 +326,135 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
               </div>
             </div>
 
-            <span className="text-xs font-medium text-slate-500">
+            <span className="text-xs font-medium text-slate-400">
               {visibleProcesses.length} {isEs ? 'visibles' : 'visible'}
             </span>
           </div>
 
-          {/* Filtros por Categoría */}
-          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-md text-xs font-medium">
-            <button
-              onClick={() => setSelectedCategory('all')}
-              className={`flex-1 py-1 text-center rounded transition-colors cursor-pointer ${
-                selectedCategory === 'all'
-                  ? 'bg-white text-slate-900 font-semibold shadow-2xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              {isEs ? 'Todos' : 'All'} ({processes.filter((p) => p.visible !== false).length})
-            </button>
-            <button
-              onClick={() => setSelectedCategory('management')}
-              className={`flex-1 py-1 text-center rounded transition-colors cursor-pointer ${
-                selectedCategory === 'management'
-                  ? 'bg-white text-slate-900 font-semibold shadow-2xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              {isEs ? 'Gestión' : 'Mgmt'}
-            </button>
-            <button
-              onClick={() => setSelectedCategory('core')}
-              className={`flex-1 py-1 text-center rounded transition-colors cursor-pointer ${
-                selectedCategory === 'core'
-                  ? 'bg-white text-slate-900 font-semibold shadow-2xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              {isEs ? 'Clave' : 'Core'}
-            </button>
-            <button
-              onClick={() => setSelectedCategory('support')}
-              className={`flex-1 py-1 text-center rounded transition-colors cursor-pointer ${
-                selectedCategory === 'support'
-                  ? 'bg-white text-slate-900 font-semibold shadow-2xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              {isEs ? 'Soporte' : 'Supp'}
-            </button>
-          </div>
-        </div>
+          {/* Lista de Procesos */}
+          <div className="flex flex-col gap-2 max-h-[560px] overflow-y-auto pr-1">
+            {categoryFilteredProcesses.map((proc) => {
+              const isVisible = proc.visible !== false;
+              const isSelected = selectedProcessId === proc.id;
 
-        {/* Lista de Procesos */}
-        <div className="flex flex-col gap-2.5 max-h-[560px] overflow-y-auto pr-1">
-          {categoryFilteredProcesses.map((proc) => {
-            const isVisible = proc.visible !== false;
-            const isSelected = selectedProcessId === proc.id;
-
-            return (
-              <div
-                key={proc.id}
-                id={`proc-item-${proc.id}`}
-                onClick={() => handleSelectProcess(proc.id)}
-                className={`p-2.5 rounded-lg border text-xs flex flex-col gap-2 transition-all cursor-pointer ${
-                  !isVisible
-                    ? 'bg-slate-50/60 border-slate-200 opacity-60'
-                    : isSelected
-                    ? 'border-slate-900 bg-slate-100/80 ring-1 ring-slate-900/20 shadow-2xs font-medium'
-                    : 'border-slate-200 bg-white hover:border-slate-300'
-                }`}
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-1.5 min-w-0 flex-1">
-                    {onToggleVisibility && (
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onToggleVisibility(proc.id);
-                        }}
-                        className={`p-1 rounded cursor-pointer transition-colors ${
-                          isVisible
-                            ? 'text-slate-700 hover:bg-slate-100'
-                            : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'
+              return (
+                <div
+                  key={proc.id}
+                  id={`proc-item-${proc.id}`}
+                  onClick={() => handleSelectProcess(proc.id)}
+                  className={`p-2.5 rounded-lg border text-xs flex flex-col gap-2 transition-all cursor-pointer ${
+                    !isVisible
+                      ? 'bg-slate-50/60 border-slate-200 opacity-60'
+                      : isSelected
+                      ? 'border-slate-900 bg-slate-100/80 ring-1 ring-slate-900/20 shadow-2xs font-medium'
+                      : 'border-slate-200 bg-white hover:border-slate-300'
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                      {onToggleVisibility && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onToggleVisibility(proc.id);
+                          }}
+                          className={`p-1 rounded cursor-pointer transition-colors ${
+                            isVisible
+                              ? 'text-slate-700 hover:bg-slate-100'
+                              : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'
+                          }`}
+                          title={
+                            isEs
+                              ? isVisible ? 'Ocultar en la matriz' : 'Mostrar en la matriz'
+                              : isVisible ? 'Hide on matrix' : 'Show on matrix'
+                          }
+                        >
+                          {isVisible ? (
+                            <Eye className="w-3.5 h-3.5 text-slate-800" />
+                          ) : (
+                            <EyeOff className="w-3.5 h-3.5 text-slate-400" />
+                          )}
+                        </button>
+                      )}
+                      <span
+                        className={`font-semibold truncate text-xs ${
+                          isVisible ? 'text-slate-900' : 'text-slate-400 line-through'
                         }`}
-                        title={
-                          isEs
-                            ? isVisible ? 'Ocultar en la matriz' : 'Mostrar en la matriz'
-                            : isVisible ? 'Hide on matrix' : 'Show on matrix'
-                        }
+                        title={proc.name}
                       >
-                        {isVisible ? (
-                          <Eye className="w-3.5 h-3.5 text-slate-800" />
-                        ) : (
-                          <EyeOff className="w-3.5 h-3.5 text-slate-400" />
-                        )}
-                      </button>
-                    )}
-                    <span
-                      className={`font-semibold truncate text-xs ${
-                        isVisible ? 'text-slate-900' : 'text-slate-400 line-through'
-                      }`}
-                      title={proc.name}
-                    >
-                      {proc.name}
+                        {proc.name}
+                      </span>
+                    </div>
+
+                    <span className="text-[9px] uppercase font-bold text-slate-400 shrink-0 bg-slate-100 px-1.5 py-0.5 rounded">
+                      {proc.category === 'management'
+                        ? isEs ? 'Gestión' : 'Mgmt'
+                        : proc.category === 'core'
+                        ? isEs ? 'Clave' : 'Core'
+                        : isEs ? 'Soporte' : 'Supp'}
                     </span>
                   </div>
 
-                  <span className="text-[9px] uppercase font-bold text-slate-400 shrink-0 bg-slate-100 px-1.5 py-0.5 rounded">
-                    {proc.category === 'management'
-                      ? isEs ? 'Gestión' : 'Mgmt'
-                      : proc.category === 'core'
-                      ? isEs ? 'Clave' : 'Core'
-                      : isEs ? 'Soporte' : 'Supp'}
-                  </span>
+                  {onUpdateProcess && isVisible && (
+                    <div
+                      className="flex flex-col gap-1.5 pt-1.5 border-t border-slate-100"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <RatingPills
+                        label={isEs ? 'Salud' : 'Health'}
+                        value={proc.health}
+                        lowText={isEs ? 'Saludable' : 'Healthy'}
+                        highText={isEs ? 'Problemas graves' : 'Severe issues'}
+                        onChange={(num) => onUpdateProcess(proc.id, { health: num })}
+                      />
+                      <RatingPills
+                        label={isEs ? 'Importancia' : 'Importance'}
+                        value={proc.importance}
+                        lowText={isEs ? 'Muy baja' : 'Very low'}
+                        highText={isEs ? 'Muy alta' : 'Very high'}
+                        onChange={(num) => onUpdateProcess(proc.id, { importance: num })}
+                      />
+                      <RatingPills
+                        label={isEs ? 'Factibilidad' : 'Feasibility'}
+                        value={proc.feasibility}
+                        lowText={isEs ? 'Muy difícil intervenir' : 'Very hard'}
+                        highText={isEs ? 'Altamente factible' : 'Highly feasible'}
+                        onChange={(num) => onUpdateProcess(proc.id, { feasibility: num })}
+                      />
+                    </div>
+                  )}
                 </div>
-
-                {onUpdateProcess && isVisible && (
-                  <div
-                    className="flex flex-col gap-1.5 pt-1.5 border-t border-slate-100"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <RatingPills
-                      label={isEs ? 'Salud' : 'Health'}
-                      value={proc.health}
-                      lowText={isEs ? 'Saludable' : 'Healthy'}
-                      highText={isEs ? 'Problemas graves' : 'Severe issues'}
-                      onChange={(num) => onUpdateProcess(proc.id, { health: num })}
-                    />
-                    <RatingPills
-                      label={isEs ? 'Importancia' : 'Importance'}
-                      value={proc.importance}
-                      lowText={isEs ? 'Muy baja' : 'Very low'}
-                      highText={isEs ? 'Muy alta' : 'Very high'}
-                      onChange={(num) => onUpdateProcess(proc.id, { importance: num })}
-                    />
-                    <RatingPills
-                      label={isEs ? 'Factibilidad' : 'Feasibility'}
-                      value={proc.feasibility}
-                      lowText={isEs ? 'Muy difícil intervenir' : 'Very hard'}
-                      highText={isEs ? 'Altamente factible' : 'Highly feasible'}
-                      onChange={(num) => onUpdateProcess(proc.id, { feasibility: num })}
-                    />
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* COLUMNA DERECHA: VISUALIZACIÓN MATRIZ 2x2 */}
-      <div className="lg:col-span-8 flex flex-col gap-3">
-        {/* Barra Superior con Exportaciones */}
-        <div className="flex items-center justify-between bg-white border border-slate-200 rounded-lg px-4 py-2.5 shadow-2xs">
-          <span className="text-xs font-semibold text-slate-900">
-            {isEs ? 'Matriz 2x2 de Portafolio' : '2x2 Portfolio Matrix'}
-          </span>
-
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={copyTableToClipboard}
-              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors cursor-pointer border ${
-                copiedTable
-                  ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
-                  : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:text-slate-900 shadow-2xs'
-              }`}
-            >
-              {copiedTable ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-slate-500" />}
-              <span>{copiedTable ? (isEs ? '¡Copiado!' : 'Copied!') : (isEs ? 'Copiar Tabla' : 'Copy Table')}</span>
-            </button>
-
-            <div className="relative">
-              <button
-                onClick={() => setIsDownloadOpen(!isDownloadOpen)}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-slate-900 hover:bg-slate-800 rounded-md transition-colors cursor-pointer shadow-2xs"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span>{isEs ? 'Descargar' : 'Download'}</span>
-                <ChevronDown className="w-3.5 h-3.5 opacity-70" />
-              </button>
-
-              {isDownloadOpen && (
-                <div
-                  className="absolute right-0 top-full mt-1 z-50 w-44 bg-white border border-slate-200 rounded-lg shadow-lg py-1 text-xs text-slate-700 animate-in fade-in zoom-in-95 duration-100"
-                  onClick={() => setIsDownloadOpen(false)}
-                >
-                  <button
-                    onClick={() => exportPortfolioDrawio(visibleProcesses, config)}
-                    className="w-full px-3 py-2 text-left hover:bg-slate-50 flex items-center justify-between transition-colors cursor-pointer"
-                  >
-                    <span className="font-medium text-slate-800">Draw.io</span>
-                    <span className="text-[10px] text-slate-400 font-mono">.drawio</span>
-                  </button>
-                  <button
-                    onClick={() => exportPortfolioPNG(config.language)}
-                    className="w-full px-3 py-2 text-left hover:bg-slate-50 flex items-center justify-between transition-colors cursor-pointer"
-                  >
-                    <span className="font-medium text-slate-800">PNG</span>
-                    <span className="text-[10px] text-slate-400 font-mono">.png</span>
-                  </button>
-                  <button
-                    onClick={() => exportPortfolioSVG(config.language)}
-                    className="w-full px-3 py-2 text-left hover:bg-slate-50 flex items-center justify-between transition-colors cursor-pointer"
-                  >
-                    <span className="font-medium text-slate-800">SVG</span>
-                    <span className="text-[10px] text-slate-400 font-mono">.svg</span>
-                  </button>
-                  <button
-                    onClick={() => exportPortfolioJPEG(config.language)}
-                    className="w-full px-3 py-2 text-left hover:bg-slate-50 flex items-center justify-between transition-colors cursor-pointer"
-                  >
-                    <span className="font-medium text-slate-800">JPEG</span>
-                    <span className="text-[10px] text-slate-400 font-mono">.jpg</span>
-                  </button>
-                  <div className="my-1 border-t border-slate-100" />
-                  <button
-                    onClick={() => exportPortfolioPDF(config.language)}
-                    className="w-full px-3 py-2 text-left hover:bg-slate-50 flex items-center justify-between transition-colors cursor-pointer text-slate-800 font-medium"
-                  >
-                    <span>PDF</span>
-                    <span className="text-[10px] text-slate-400 font-mono">.pdf</span>
-                  </button>
-                </div>
-              )}
-            </div>
+              );
+            })}
           </div>
         </div>
 
-        {/* Lienzo SVG de la Matriz */}
-        <div className="flex justify-center items-center bg-white border border-slate-200 rounded-lg p-5 shadow-2xs overflow-x-auto">
-          <PortfolioSvgMatrix
-            visibleProcesses={visibleProcesses}
-            config={config}
-            coords={coords}
-            clusters={clusters}
-            placedLabels={placedLabels}
-            selectedProcessId={selectedProcessId}
-            draggingProcessId={draggingProcessId}
-            isEs={isEs}
-            onPointerDown={handlePointerDown}
-            onPointerMove={handlePointerMove}
-            onPointerUp={handlePointerUp}
-          />
+        {/* COLUMNA DERECHA: VISUALIZACIÓN MATRIZ 2x2 */}
+        <div className="lg:col-span-7 flex flex-col gap-3">
+          <div className="bg-white border border-slate-200 rounded-lg p-4 shadow-2xs">
+            <div className="flex items-center justify-between pb-2 mb-3 border-b border-slate-100">
+              <span className="text-xs font-semibold text-slate-900">
+                {isEs ? 'Matriz 2x2 de Portafolio' : '2x2 Portfolio Matrix'}
+              </span>
+            </div>
+
+            <div className="flex justify-center items-center overflow-x-auto">
+              <PortfolioSvgMatrix
+                visibleProcesses={visibleProcesses}
+                config={config}
+                coords={coords}
+                clusters={clusters}
+                placedLabels={placedLabels}
+                selectedProcessId={selectedProcessId}
+                draggingProcessId={draggingProcessId}
+                isEs={isEs}
+                onPointerDown={handlePointerDown}
+                onPointerMove={handlePointerMove}
+                onPointerUp={handlePointerUp}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </div>
