@@ -53,6 +53,7 @@ export function useBPMState() {
   const [groupToDelete, setGroupToDelete] = useState<string | null>(null);
   const [assigningToGroup, setAssigningToGroup] = useState<string | null>(null);
   const [isClearAllOpen, setIsClearAllOpen] = useState(false);
+  const [exampleToLoad, setExampleToLoad] = useState<string | null>(null);
 
   // Drag and Drop
   const [draggedProcessId, setDraggedProcessId] = useState<string | null>(null);
@@ -126,7 +127,7 @@ export function useBPMState() {
     );
   };
 
-  const loadExample = (exampleId: string) => {
+  const executeLoadExample = (exampleId: string) => {
     const ex = EXAMPLES.find((e) => e.id === exampleId);
     if (ex) {
       const clonedCompany: CompanyProfile = JSON.parse(JSON.stringify(ex.company));
@@ -155,7 +156,26 @@ export function useBPMState() {
       setDraggedProcessId(null);
       setCanDrag(null);
       setDragOverTarget(null);
+      setExampleToLoad(null);
     }
+  };
+
+  const loadExample = (exampleId: string) => {
+    if (processes.length > 0) {
+      setExampleToLoad(exampleId);
+    } else {
+      executeLoadExample(exampleId);
+    }
+  };
+
+  const confirmLoadExample = () => {
+    if (exampleToLoad) {
+      executeLoadExample(exampleToLoad);
+    }
+  };
+
+  const cancelLoadExample = () => {
+    setExampleToLoad(null);
   };
 
   const openCreateModal = (presetCategory?: ProcessCategory, presetGroup?: string) => {
@@ -457,6 +477,11 @@ export function useBPMState() {
     canDrag,
     setCanDrag,
     dragOverTarget,
+
+    // Modales y confirmaciones
+    exampleToLoad,
+    confirmLoadExample,
+    cancelLoadExample,
 
     // Actions
     loadExample,

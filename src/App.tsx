@@ -10,6 +10,8 @@ import { DeleteProcessModal } from './components/modals/DeleteProcessModal';
 import { DeleteGroupModal } from './components/modals/DeleteGroupModal';
 import { SettingsModal } from './components/modals/SettingsModal';
 import { ClearProcessesModal } from './components/modals/ClearProcessesModal';
+import { ConfirmExampleModal } from './components/modals/ConfirmExampleModal';
+import { EXAMPLES } from './examples';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -162,6 +164,15 @@ export const App: React.FC = () => {
         isEs={isEs}
         onClose={() => setIsSettingsOpen(false)}
         onSetConfig={bpm.setConfig}
+      />
+
+      <ConfirmExampleModal
+        isOpen={Boolean(bpm.exampleToLoad)}
+        exampleName={EXAMPLES.find((e) => e.id === bpm.exampleToLoad)?.name || ''}
+        processCount={bpm.processes.length}
+        isEs={isEs}
+        onCancel={bpm.cancelLoadExample}
+        onConfirm={bpm.confirmLoadExample}
       />
 
       <ToastContainer
