@@ -44,6 +44,7 @@ export interface CompanyProfile {
 export interface AppConfig {
   language: 'es' | 'en';
   allowDecimals: boolean;
+  decimalStep?: number; // 0.1, 0.25, 0.5, 1
   fontFamily: string;
   fontSize: number;
 }

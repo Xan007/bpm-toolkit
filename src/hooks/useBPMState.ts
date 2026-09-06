@@ -52,6 +52,7 @@ export function useBPMState() {
   const [deleteTarget, setDeleteTarget] = useState<BPMProcess | null>(null);
   const [groupToDelete, setGroupToDelete] = useState<string | null>(null);
   const [assigningToGroup, setAssigningToGroup] = useState<string | null>(null);
+  const [isClearAllOpen, setIsClearAllOpen] = useState(false);
 
   // Drag and Drop
   const [draggedProcessId, setDraggedProcessId] = useState<string | null>(null);
@@ -226,6 +227,16 @@ export function useBPMState() {
     }
   };
 
+  const clearAllProcesses = () => {
+    setProcesses([]);
+    setCoreGroupsOrder([]);
+    setEditingCardId(null);
+    setDeleteTarget(null);
+    setGroupToDelete(null);
+    setAssigningToGroup(null);
+    setIsClearAllOpen(false);
+  };
+
   const toggleProcessVisibility = (id: string) => {
     setProcesses((prev) =>
       prev.map((p) => (p.id === id ? { ...p, visible: p.visible === false ? true : false } : p))
@@ -245,6 +256,18 @@ export function useBPMState() {
     }
     setNewGroupName('');
     setIsAddingGroup(false);
+  };
+
+  const handleRenameGroup = (oldName: string, newName: string) => {
+    const trimmed = newName.trim();
+    if (!trimmed || trimmed === oldName) return;
+
+    setCoreGroupsOrder((prev) => prev.map((g) => (g === oldName ? trimmed : g)));
+    setProcesses((prev) =>
+      prev.map((p) =>
+        p.category === 'core' && p.groupName === oldName ? { ...p, groupName: trimmed } : p
+      )
+    );
   };
 
   const handleAssignProcessToGroup = (processId: string, groupName: string) => {
@@ -412,6 +435,8 @@ export function useBPMState() {
     setGroupToDelete,
     assigningToGroup,
     setAssigningToGroup,
+    isClearAllOpen,
+    setIsClearAllOpen,
 
     // Inline edit
     editingCardId,
@@ -441,9 +466,11 @@ export function useBPMState() {
     saveInlineEdit,
     cancelInlineEdit,
     confirmDelete,
+    clearAllProcesses,
     toggleProcessVisibility,
     autoFitLabels,
     handleAddNewGroup,
+    handleRenameGroup,
     handleAssignProcessToGroup,
     openDeleteGroupModal,
     handleDeleteGroupAndProcesses,

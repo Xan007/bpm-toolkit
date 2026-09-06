@@ -8,8 +8,8 @@ import { ProcessProfileView } from './ProcessProfileView';
 import { CreateProcessModal } from './components/modals/CreateProcessModal';
 import { DeleteProcessModal } from './components/modals/DeleteProcessModal';
 import { DeleteGroupModal } from './components/modals/DeleteGroupModal';
-import { AssignProcessModal } from './components/modals/AssignProcessModal';
 import { SettingsModal } from './components/modals/SettingsModal';
+import { ClearProcessesModal } from './components/modals/ClearProcessesModal';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -17,7 +17,6 @@ export const App: React.FC = () => {
   const bpm = useBPMState();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const isEs = bpm.config.language === 'es';
-  const coreProcesses = bpm.processes.filter((p) => p.category === 'core');
 
   return (
     <div
@@ -48,6 +47,7 @@ export const App: React.FC = () => {
         onSetActiveTab={bpm.setActiveTab}
         onSetConfig={bpm.setConfig}
         onOpenSettings={() => setIsSettingsOpen(true)}
+        onLoadExample={bpm.loadExample}
       />
 
       {/* Main Content */}
@@ -61,13 +61,13 @@ export const App: React.FC = () => {
               isEs={isEs}
               onOpenCreateModal={bpm.openCreateModal}
               onOpenDeleteGroupModal={bpm.openDeleteGroupModal}
-              onSetAssigningToGroup={bpm.setAssigningToGroup}
               onSetDeleteTarget={bpm.setDeleteTarget}
               isAddingGroup={bpm.isAddingGroup}
               newGroupName={bpm.newGroupName}
               onSetIsAddingGroup={bpm.setIsAddingGroup}
               onSetNewGroupName={bpm.setNewGroupName}
               onAddNewGroup={bpm.handleAddNewGroup}
+              onRenameGroup={bpm.handleRenameGroup}
               editingCardId={bpm.editingCardId}
               editName={bpm.editName}
               onSetEditName={bpm.setEditName}
@@ -75,7 +75,7 @@ export const App: React.FC = () => {
               onSaveInlineEdit={bpm.saveInlineEdit}
               onCancelInlineEdit={bpm.cancelInlineEdit}
               onDragEnd={bpm.onDragEnd}
-              onLoadExample={bpm.loadExample}
+              onClearAll={() => bpm.setIsClearAllOpen(true)}
             />
           </div>
         )}
@@ -117,11 +117,14 @@ export const App: React.FC = () => {
         formName={bpm.formName}
         formCategory={bpm.formCategory}
         formGroup={bpm.formGroup}
+        availableGroups={bpm.coreGroupsOrder}
+        allProcesses={bpm.processes}
         formHealth={bpm.formHealth}
         formImp={bpm.formImp}
         formFeas={bpm.formFeas}
         onClose={() => bpm.setIsCreateOpen(false)}
         onSubmit={bpm.handleCreateProcess}
+        onAssignProcess={bpm.handleAssignProcessToGroup}
         onSetFormName={bpm.setFormName}
         onSetFormCategory={bpm.setFormCategory}
         onSetFormGroup={bpm.setFormGroup}
@@ -137,20 +140,20 @@ export const App: React.FC = () => {
         onConfirm={bpm.confirmDelete}
       />
 
+      <ClearProcessesModal
+        isOpen={bpm.isClearAllOpen}
+        processCount={bpm.processes.length}
+        isEs={isEs}
+        onCancel={() => bpm.setIsClearAllOpen(false)}
+        onConfirm={bpm.clearAllProcesses}
+      />
+
       <DeleteGroupModal
         groupName={bpm.groupToDelete}
         isEs={isEs}
         onDeleteAll={bpm.handleDeleteGroupAndProcesses}
         onDeleteGroupOnly={bpm.handleDeleteGroupOnly}
         onCancel={() => bpm.setGroupToDelete(null)}
-      />
-
-      <AssignProcessModal
-        assigningToGroup={bpm.assigningToGroup}
-        coreProcesses={coreProcesses}
-        isEs={isEs}
-        onAssignProcessToGroup={bpm.handleAssignProcessToGroup}
-        onClose={() => bpm.setAssigningToGroup(null)}
       />
 
       <SettingsModal

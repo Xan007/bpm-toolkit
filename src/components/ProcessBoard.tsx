@@ -1,7 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React from 'react';
 import { BPMProcess, ProcessCategory } from '../types';
-import { Plus, Sparkles, ChevronDown, Check } from 'lucide-react';
-import { EXAMPLES } from '../examples';
+import { Plus } from 'lucide-react';
 import { DragDropContext, DropResult } from '@hello-pangea/dnd';
 import { SimpleCategoryColumn } from './board/SimpleCategoryColumn';
 import { CoreCategoryColumn } from './board/CoreCategoryColumn';
@@ -13,7 +12,6 @@ interface ProcessBoardProps {
 
   onOpenCreateModal: (presetCategory?: ProcessCategory, presetGroup?: string) => void;
   onOpenDeleteGroupModal: (groupName: string) => void;
-  onSetAssigningToGroup: (groupName: string | null) => void;
   onSetDeleteTarget: (proc: BPMProcess | null) => void;
 
   isAddingGroup: boolean;
@@ -21,6 +19,7 @@ interface ProcessBoardProps {
   onSetIsAddingGroup: (val: boolean) => void;
   onSetNewGroupName: (val: string) => void;
   onAddNewGroup: (e: React.FormEvent) => void;
+  onRenameGroup?: (oldName: string, newName: string) => void;
 
   editingCardId: string | null;
   editName: string;
@@ -30,7 +29,7 @@ interface ProcessBoardProps {
   onCancelInlineEdit: () => void;
 
   onDragEnd: (result: DropResult) => void;
-  onLoadExample?: (exampleId: string) => void;
+  onClearAll?: () => void;
 }
 
 export const ProcessBoard: React.FC<ProcessBoardProps> = ({
@@ -40,7 +39,6 @@ export const ProcessBoard: React.FC<ProcessBoardProps> = ({
 
   onOpenCreateModal,
   onOpenDeleteGroupModal,
-  onSetAssigningToGroup,
   onSetDeleteTarget,
 
   isAddingGroup,
@@ -48,6 +46,7 @@ export const ProcessBoard: React.FC<ProcessBoardProps> = ({
   onSetIsAddingGroup,
   onSetNewGroupName,
   onAddNewGroup,
+  onRenameGroup,
 
   editingCardId,
   editName,
@@ -57,20 +56,9 @@ export const ProcessBoard: React.FC<ProcessBoardProps> = ({
   onCancelInlineEdit,
 
   onDragEnd,
-  onLoadExample,
+  onClearAll,
 }) => {
-  const [isExamplesOpen, setIsExamplesOpen] = useState(false);
-  const examplesMenuRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (examplesMenuRef.current && !examplesMenuRef.current.contains(e.target as Node)) {
-        setIsExamplesOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  const [isDraggingAny, setIsDraggingAny] = React.useState(false);
 
   const mgmtProcesses = processes
     .filter((p) => p.category === 'management')
@@ -86,8 +74,13 @@ export const ProcessBoard: React.FC<ProcessBoardProps> = ({
 
   const looseCoreProcesses = coreProcesses.filter((p) => !p.groupName);
 
+  const handleDragEnd = (result: DropResult) => {
+    setIsDraggingAny(false);
+    onDragEnd(result);
+  };
+
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
+    <DragDropContext onDragStart={() => setIsDraggingAny(true)} onDragEnd={handleDragEnd}>
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <div>
@@ -102,39 +95,16 @@ export const ProcessBoard: React.FC<ProcessBoardProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Dropdown de Ejemplos Simplificado */}
-            {onLoadExample && (
-              <div className="relative" ref={examplesMenuRef}>
-                <button
-                  type="button"
-                  onClick={() => setIsExamplesOpen(!isExamplesOpen)}
-                  className="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-medium px-3 py-1.5 rounded-md transition-colors cursor-pointer flex items-center gap-1.5 shadow-2xs"
-                >
-                  <span>{isEs ? 'Ejemplos' : 'Examples'}</span>
-                  <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
-                </button>
-
-                {isExamplesOpen && (
-                  <div className="absolute right-0 top-full mt-1 z-50 w-56 bg-white border border-slate-200 rounded-lg shadow-lg py-1 text-xs text-slate-700 animate-in fade-in zoom-in-95 duration-100">
-                    {EXAMPLES.map((ex) => (
-                      <button
-                        key={ex.id}
-                        type="button"
-                        onClick={() => {
-                          onLoadExample(ex.id);
-                          setIsExamplesOpen(false);
-                        }}
-                        className="w-full px-3 py-2 text-left hover:bg-slate-50 flex items-center justify-between transition-colors cursor-pointer"
-                      >
-                        <span className="font-medium text-slate-800">{ex.name}</span>
-                        <span className="text-[10px] text-slate-400 font-mono">
-                          {ex.processes.length} {isEs ? 'proc.' : 'procs.'}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+            {/* Botón para Limpiar Todo */}
+            {onClearAll && processes.length > 0 && (
+              <button
+                type="button"
+                onClick={onClearAll}
+                className="bg-white hover:bg-red-50 text-slate-600 hover:text-red-600 border border-slate-200 hover:border-red-200 text-xs font-medium px-3 py-1.5 rounded-md transition-colors cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                title={isEs ? 'Eliminar todos los procesos' : 'Clear all processes'}
+              >
+                <span>{isEs ? 'Limpiar Todo' : 'Clear All'}</span>
+              </button>
             )}
 
             <button
@@ -175,11 +145,12 @@ export const ProcessBoard: React.FC<ProcessBoardProps> = ({
             newGroupName={newGroupName}
             editingCardId={editingCardId}
             editName={editName}
+            isDraggingAny={isDraggingAny}
             onSetIsAddingGroup={onSetIsAddingGroup}
             onSetNewGroupName={onSetNewGroupName}
             onAddNewGroup={onAddNewGroup}
+            onRenameGroup={onRenameGroup}
             onOpenCreateModal={(cat, group) => onOpenCreateModal(cat, group)}
-            onSetAssigningToGroup={onSetAssigningToGroup}
             onOpenDeleteGroupModal={onOpenDeleteGroupModal}
             onSetEditName={onSetEditName}
             onStartInlineEdit={onStartInlineEdit}

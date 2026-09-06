@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { AppConfig, CompanyProfile } from '../types';
-import { Building2, Grid2X2, Layers, FileText, Settings } from 'lucide-react';
+import { Building2, Grid2X2, Layers, FileText, Settings, ChevronDown } from 'lucide-react';
+import { EXAMPLES } from '../examples';
 
 interface HeaderProps {
   company: CompanyProfile;
@@ -10,6 +11,7 @@ interface HeaderProps {
   onSetActiveTab: (tab: 'inventory' | 'portfolio' | 'architecture' | 'profile') => void;
   onSetConfig: (config: AppConfig) => void;
   onOpenSettings: () => void;
+  onLoadExample?: (exampleId: string) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -20,7 +22,21 @@ export const Header: React.FC<HeaderProps> = ({
   onSetActiveTab,
   onSetConfig,
   onOpenSettings,
+  onLoadExample,
 }) => {
+  const [isExamplesOpen, setIsExamplesOpen] = useState(false);
+  const examplesMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (examplesMenuRef.current && !examplesMenuRef.current.contains(e.target as Node)) {
+        setIsExamplesOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   return (
     <header className="bg-white border-b border-slate-200 sticky top-0 z-30 px-3 sm:px-6 py-2.5 sm:py-3 flex flex-wrap items-center justify-between gap-2.5">
       <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
@@ -72,8 +88,46 @@ export const Header: React.FC<HeaderProps> = ({
         </button>
       </nav>
 
-      {/* Botón Configuración (Tuerca) */}
+      {/* Acciones Derecha: Ejemplos y Configuración */}
       <div className="flex items-center gap-2">
+        {onLoadExample && (
+          <div className="relative" ref={examplesMenuRef}>
+            <button
+              type="button"
+              onClick={() => setIsExamplesOpen(!isExamplesOpen)}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-colors text-xs font-medium cursor-pointer"
+              title={isEs ? 'Cargar dataset de ejemplo' : 'Load example dataset'}
+            >
+              <span>{isEs ? 'Ejemplos' : 'Examples'}</span>
+              <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+            </button>
+
+            {isExamplesOpen && (
+              <div className="absolute right-0 top-full mt-1 z-50 w-56 bg-white border border-slate-200 rounded-lg shadow-lg py-1 text-xs text-slate-700 animate-in fade-in zoom-in-95 duration-100">
+                <div className="px-3 py-1.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-100">
+                  {isEs ? 'Plantillas / Ejemplos' : 'Templates / Examples'}
+                </div>
+                {EXAMPLES.map((ex) => (
+                  <button
+                    key={ex.id}
+                    type="button"
+                    onClick={() => {
+                      onLoadExample(ex.id);
+                      setIsExamplesOpen(false);
+                    }}
+                    className="w-full px-3 py-2 text-left hover:bg-slate-50 flex items-center justify-between transition-colors cursor-pointer"
+                  >
+                    <span className="font-medium text-slate-800">{ex.name}</span>
+                    <span className="text-[10px] text-slate-400 font-mono">
+                      {ex.processes.length} {isEs ? 'proc.' : 'procs.'}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
         <button
           onClick={onOpenSettings}
           className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-colors text-xs font-medium cursor-pointer"

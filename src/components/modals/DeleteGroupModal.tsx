@@ -48,7 +48,7 @@ export const DeleteGroupModal: React.FC<DeleteGroupModalProps> = ({
             onClick={onDeleteGroupOnly}
             className="w-full px-3 py-2 rounded border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-medium cursor-pointer text-left"
           >
-            {isEs ? 'Eliminar grupo y mantener procesos sueltos' : 'Delete group but keep processes (ungrouped)'}
+            {isEs ? 'Eliminar grupo y mantener procesos sin grupo' : 'Delete group but keep processes (ungrouped)'}
           </button>
           <button
             onClick={onCancel}

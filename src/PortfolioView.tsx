@@ -13,7 +13,7 @@ import {
   padX,
   padY
 } from './portfolioLayout';
-import { Download, Eye, EyeOff, HelpCircle, ChevronDown, Check, Copy } from 'lucide-react';
+import { Download, Eye, EyeOff, HelpCircle, ChevronDown, Check, Copy, Move } from 'lucide-react';
 import { RatingPills } from './features/portfolio/components/RatingPills';
 import { PortfolioSvgMatrix } from './features/portfolio/components/PortfolioSvgMatrix';
 import {
@@ -32,6 +32,7 @@ interface PortfolioViewProps {
   onAutoFit?: () => void;
   onToggleVisibility?: (id: string) => void;
   onUpdateProcess?: (id: string, updates: Partial<BPMProcess>) => void;
+  onSetConfig?: (config: AppConfig) => void;
 }
 
 export const PortfolioView: React.FC<PortfolioViewProps> = ({
@@ -39,8 +40,11 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
   config,
   onToggleVisibility,
   onUpdateProcess,
+  onSetConfig,
 }) => {
   const isEs = config.language === 'es';
+  const allowDecimals = config.allowDecimals ?? false;
+  const decimalStep = config.decimalStep || (allowDecimals ? 0.5 : 1);
 
   const [selectedCategory, setSelectedCategory] = useState<ProcessCategory | 'all'>('all');
   const [selectedProcessId, setSelectedProcessId] = useState<string | null>(null);
@@ -78,11 +82,22 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
 
     const usableW = boxW - 2 * padX;
     const nx = (mouseX - (boxX + padX)) / usableW;
-    const newHealth = Math.max(1, Math.min(5, Math.round(1 + nx * 4)));
+    const rawHealth = 1 + nx * 4;
 
     const usableH = boxH - 2 * padY;
     const ny = ((boxY + boxH - padY) - mouseY) / usableH;
-    const newImp = Math.max(1, Math.min(5, Math.round(1 + ny * 4)));
+    const rawImp = 1 + ny * 4;
+
+    const snapValue = (val: number, step: number) => {
+      const clamped = Math.max(1, Math.min(5, val));
+      if (!allowDecimals || step === 1) {
+        return Math.round(clamped);
+      }
+      return Math.round(clamped / step) * step;
+    };
+
+    const newHealth = parseFloat(snapValue(rawHealth, decimalStep).toFixed(2));
+    const newImp = parseFloat(snapValue(rawImp, decimalStep).toFixed(2));
 
     const currentProc = processes.find((p) => p.id === procId);
     if (currentProc && (currentProc.health !== newHealth || currentProc.importance !== newImp)) {
@@ -213,6 +228,46 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Selector de Decimales / Incremento */}
+          {onSetConfig && (
+            <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200/80 px-2 py-1 rounded-md text-xs">
+              <label className="text-[11px] font-medium text-slate-600 cursor-pointer flex items-center gap-1.5">
+                <input
+                  type="checkbox"
+                  checked={allowDecimals}
+                  onChange={(e) =>
+                    onSetConfig({
+                      ...config,
+                      allowDecimals: e.target.checked,
+                      decimalStep: e.target.checked ? config.decimalStep || 0.5 : 1,
+                    })
+                  }
+                  className="rounded text-slate-900 accent-slate-900 cursor-pointer"
+                />
+                <span>{isEs ? 'Decimales' : 'Decimals'}</span>
+              </label>
+
+              {allowDecimals && (
+                <select
+                  value={decimalStep}
+                  onChange={(e) =>
+                    onSetConfig({
+                      ...config,
+                      decimalStep: parseFloat(e.target.value),
+                    })
+                  }
+                  className="bg-white border border-slate-200 rounded px-1.5 py-0.5 text-[11px] font-mono text-slate-800 outline-none cursor-pointer"
+                  title={isEs ? 'Paso de incremento' : 'Step increment'}
+                >
+                  <option value="0.1">0.1</option>
+                  <option value="0.25">0.25</option>
+                  <option value="0.5">0.5</option>
+                  <option value="1">1.0</option>
+                </select>
+              )}
+            </div>
+          )}
+
           <button
             type="button"
             onClick={copyTableToClipboard}
@@ -406,6 +461,8 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
                         value={proc.health}
                         lowText={isEs ? 'Saludable' : 'Healthy'}
                         highText={isEs ? 'Problemas graves' : 'Severe issues'}
+                        allowDecimals={allowDecimals}
+                        step={decimalStep}
                         onChange={(num) => onUpdateProcess(proc.id, { health: num })}
                       />
                       <RatingPills
@@ -413,6 +470,8 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
                         value={proc.importance}
                         lowText={isEs ? 'Muy baja' : 'Very low'}
                         highText={isEs ? 'Muy alta' : 'Very high'}
+                        allowDecimals={allowDecimals}
+                        step={decimalStep}
                         onChange={(num) => onUpdateProcess(proc.id, { importance: num })}
                       />
                       <RatingPills
@@ -420,6 +479,8 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
                         value={proc.feasibility}
                         lowText={isEs ? 'Muy difícil intervenir' : 'Very hard'}
                         highText={isEs ? 'Altamente factible' : 'Highly feasible'}
+                        allowDecimals={allowDecimals}
+                        step={decimalStep}
                         onChange={(num) => onUpdateProcess(proc.id, { feasibility: num })}
                       />
                     </div>
@@ -433,10 +494,18 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
         {/* COLUMNA DERECHA: VISUALIZACIÓN MATRIZ 2x2 */}
         <div className="lg:col-span-8 xl:col-span-8 flex flex-col gap-3">
           <div className="bg-white border border-slate-200 rounded-lg p-4 shadow-2xs">
-            <div className="flex items-center justify-between pb-2 mb-3 border-b border-slate-100">
+            <div className="flex flex-wrap items-center justify-between pb-2 mb-3 border-b border-slate-100 gap-2">
               <span className="text-xs font-semibold text-slate-900">
                 {isEs ? 'Matriz 2x2 de Portafolio' : '2x2 Portfolio Matrix'}
               </span>
+              <div className="flex items-center gap-1.5 text-[11px] text-slate-500 bg-slate-50 border border-slate-200/80 px-2.5 py-1 rounded-md">
+                <Move className="w-3 h-3 text-slate-600" />
+                <span>
+                  {isEs
+                    ? 'Tip: Puedes arrastrar los círculos directamente en la matriz para actualizar su salud e importancia.'
+                    : 'Tip: You can drag circles directly on the matrix to update health and importance.'}
+                </span>
+              </div>
             </div>
 
             <div className="flex justify-center items-center overflow-x-auto">
