@@ -197,14 +197,35 @@ export function useBPMState() {
       name: formName.trim(),
       category: formCategory,
       groupName: formCategory === 'core' ? formGroup.trim() || undefined : undefined,
-      health: Math.max(1, Math.min(5, Math.round(formHealth))),
-      importance: Math.max(1, Math.min(5, Math.round(formImp))),
-      feasibility: Math.max(1, Math.min(5, Math.round(formFeas))),
+      health: 3,
+      importance: 3,
+      feasibility: 3,
       labelPosition: 'left',
       visible: true,
     };
 
     setProcesses((prev) => autoOptimizeLabelPositions([...prev, newProc]));
+    setIsCreateOpen(false);
+  };
+
+  const handleCreateBulkProcesses = (names: string[]) => {
+    const validNames = names.map((n) => n.trim()).filter(Boolean);
+    if (validNames.length === 0) return;
+
+    const timestamp = Date.now();
+    const newProcs: BPMProcess[] = validNames.map((name, idx) => ({
+      id: `${timestamp}-${idx}-${Math.random().toString(36).substring(2, 6)}`,
+      name,
+      category: formCategory,
+      groupName: formCategory === 'core' ? formGroup.trim() || undefined : undefined,
+      health: 3,
+      importance: 3,
+      feasibility: 3,
+      labelPosition: 'left',
+      visible: true,
+    }));
+
+    setProcesses((prev) => autoOptimizeLabelPositions([...prev, ...newProcs]));
     setIsCreateOpen(false);
   };
 
@@ -487,6 +508,7 @@ export function useBPMState() {
     loadExample,
     openCreateModal,
     handleCreateProcess,
+    handleCreateBulkProcesses,
     startInlineEdit,
     saveInlineEdit,
     cancelInlineEdit,

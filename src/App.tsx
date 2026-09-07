@@ -126,6 +126,7 @@ export const App: React.FC = () => {
         formFeas={bpm.formFeas}
         onClose={() => bpm.setIsCreateOpen(false)}
         onSubmit={bpm.handleCreateProcess}
+        onBulkSubmit={bpm.handleCreateBulkProcesses}
         onAssignProcess={bpm.handleAssignProcessToGroup}
         onSetFormName={bpm.setFormName}
         onSetFormCategory={bpm.setFormCategory}
