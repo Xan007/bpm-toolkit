@@ -369,7 +369,7 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
                       </div>
                       <div>
                         <strong className="text-slate-100">{isEs ? 'Salud:' : 'Health:'}</strong>{' '}
-                        <span>1 = {isEs ? 'Deficiente (Problemas graves)' : 'Poor (Severe issues)'}</span> | <span>5 = {isEs ? 'Bueno (Saludable)' : 'Good (Healthy)'}</span>
+                        <span>1 = {isEs ? 'Saludable (Bueno)' : 'Healthy (Good)'}</span> | <span>5 = {isEs ? 'Deficiente (Problemas graves)' : 'Poor (Severe issues)'}</span>
                       </div>
                       <div>
                         <strong className="text-slate-100">{isEs ? 'Factibilidad:' : 'Feasibility:'}</strong>{' '}
@@ -459,8 +459,8 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
                       <RatingPills
                         label={isEs ? 'Salud' : 'Health'}
                         value={proc.health}
-                        lowText={isEs ? 'Deficiente' : 'Poor'}
-                        highText={isEs ? 'Bueno' : 'Good'}
+                        lowText={isEs ? 'Saludable' : 'Healthy'}
+                        highText={isEs ? 'Deficiente' : 'Poor'}
                         allowDecimals={allowDecimals}
                         step={decimalStep}
                         onChange={(num) => onUpdateProcess(proc.id, { health: num })}

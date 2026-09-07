@@ -103,10 +103,10 @@ export function generatePortfolioXML(processes: BPMProcess[], config: AppConfig)
     </mxCell>
 
     <!-- Escalas Eje X -->
-    <mxCell id="${cid++}" value="${labels.poor}" style="text;html=1;fontColor=#222222;align=left;verticalAlign=top;fontSize=14;fontFamily=${config.fontFamily};" vertex="1" parent="1">
+    <mxCell id="${cid++}" value="${labels.good}" style="text;html=1;fontColor=#222222;align=left;verticalAlign=top;fontSize=14;fontFamily=${config.fontFamily};" vertex="1" parent="1">
       <mxGeometry x="${boxX + 4}" y="${boxY + boxH + 14}" width="60" height="24" as="geometry" />
     </mxCell>
-    <mxCell id="${cid++}" value="${labels.good}" style="text;html=1;fontColor=#222222;align=right;verticalAlign=top;fontSize=14;fontFamily=${config.fontFamily};" vertex="1" parent="1">
+    <mxCell id="${cid++}" value="${labels.poor}" style="text;html=1;fontColor=#222222;align=right;verticalAlign=top;fontSize=14;fontFamily=${config.fontFamily};" vertex="1" parent="1">
       <mxGeometry x="${boxX + boxW - 64}" y="${boxY + boxH + 14}" width="60" height="24" as="geometry" />
     </mxCell>
 

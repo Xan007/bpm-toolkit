@@ -235,7 +235,7 @@ export const CreateProcessModal: React.FC<CreateProcessModalProps> = ({
                   className="w-full px-2 py-1 bg-white border border-slate-300 rounded outline-none text-center font-semibold mb-1"
                 />
                 <span className="block text-[9.5px] text-slate-500 leading-tight text-center">
-                  {isEs ? '1: Deficiente\n5: Bueno' : '1: Poor\n5: Good'}
+                  {isEs ? '1: Saludable\n5: Deficiente' : '1: Healthy\n5: Poor'}
                 </span>
               </div>
               <div>

@@ -79,10 +79,10 @@ export const PortfolioSvgMatrix: React.FC<PortfolioSvgMatrixProps> = ({
         {isEs ? 'Salud' : 'Health'}
       </text>
       <text x={boxX + 6} y={boxY + boxH + 26} textAnchor="start" fill="#222222" fontSize="14">
-        {isEs ? 'Deficiente' : 'Poor'}
+        {isEs ? 'Bueno' : 'Good'}
       </text>
       <text x={boxX + boxW - 6} y={boxY + boxH + 26} textAnchor="end" fill="#222222" fontSize="14">
-        {isEs ? 'Bueno' : 'Good'}
+        {isEs ? 'Deficiente' : 'Poor'}
       </text>
 
       {/* Leyenda Factibilidad */}
