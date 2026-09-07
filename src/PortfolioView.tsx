@@ -82,7 +82,7 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
 
     const usableW = boxW - 2 * padX;
     const nx = (mouseX - (boxX + padX)) / usableW;
-    const rawHealth = 1 + nx * 4;
+    const rawHealth = 5 - nx * 4;
 
     const usableH = boxH - 2 * padY;
     const ny = ((boxY + boxH - padY) - mouseY) / usableH;

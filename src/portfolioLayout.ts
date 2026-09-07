@@ -59,7 +59,7 @@ export function computeDispersedClusters(processes: BPMProcess[]): DispersedResu
 
   groups.forEach((indices, key) => {
     const p0 = processes[indices[0]];
-    const nx = Math.max(0, Math.min(1, (p0.health - 1.0) / 4.0));
+    const nx = Math.max(0, Math.min(1, (5.0 - p0.health) / 4.0));
     const baseCx = boxX + padX + nx * (boxW - 2 * padX);
 
     const ny = Math.max(0, Math.min(1, (p0.importance - 1.0) / 4.0));
